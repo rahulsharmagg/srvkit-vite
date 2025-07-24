@@ -1,0 +1,18 @@
+{
+    "name": "srvkit/vite",
+    "description": "Vite Plugin",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Srvkit": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Rahul Sharma"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
