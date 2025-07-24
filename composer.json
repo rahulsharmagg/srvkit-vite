@@ -1,6 +1,7 @@
 {
     "name": "srvkit/vite",
-    "description": "Vite Plugin",
+    "version": "0.0.1",
+    "description": "Vite Plugin for PHP",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -14,5 +15,12 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "prefer-stable": true,
+    "require": {},
+    "keywords": ["vite", "plugin", "php"],
+    "homepage": "https://github.com/rahulsharmagg/srvkit-vite",
+    "support": {
+        "issues": "https://github.com/rahulsharmagg/srvkit-vite/issues",
+        "source": "https://github.com/rahulsharmagg/srvkit-vite"
+    }
 }
