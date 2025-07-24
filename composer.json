@@ -1,6 +1,6 @@
 {
     "name": "srvkit/vite",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Vite Plugin for PHP",
     "type": "library",
     "license": "MIT",
