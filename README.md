@@ -1,6 +1,7 @@
 # srvkit-vite
 
-![Tests](https://github.com/rahulsharmagg/srvkit-vite/actions/workflows/tests.yml/badge.svg)
+[![PHPUnit](https://github.com/rahulsharmagg/srvkit-vite/actions/workflows/phpunit.yml/badge.svg)](https://github.com/rahulsharmagg/srvkit-vite/actions/workflows/phpunit.yml)
+
 
 
 Vite plugin for php
