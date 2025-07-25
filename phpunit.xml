@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    stopOnFailure="false"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    failOnRisky="true"
+>
+    <testsuites>
+        <testsuite name="SrvKit - Vite Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <php></php>
+</phpunit>
