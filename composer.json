@@ -15,12 +15,22 @@
         }
     ],
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "require": {},
+    "prefer-stable": false,
     "keywords": ["vite", "plugin", "php"],
     "homepage": "https://github.com/rahulsharmagg/srvkit-vite",
     "support": {
         "issues": "https://github.com/rahulsharmagg/srvkit-vite/issues",
         "source": "https://github.com/rahulsharmagg/srvkit-vite"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "11.5.x-dev"
+    },
+    "extra": {
+        "codeigniter4": {
+            "discoverable": true,
+            "modules": [
+                "SrvKit\\Vite\\CI"
+            ]
+        }
     }
 }
