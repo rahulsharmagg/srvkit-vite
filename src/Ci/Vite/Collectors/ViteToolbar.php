@@ -2,23 +2,15 @@
 
 declare(strict_types=1);
 
-/**
- * This file is part of CodeIgniter Shield.
- *
- * (c) CodeIgniter Foundation <admin@codeigniter.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
+namespace SrvKit\Ci\Vite\Collectors;
 
-namespace SrvKit\Vite\CI;
-
+use SrvKit\Vite\Vite;
 use CodeIgniter\Debug\Toolbar\Collectors\BaseCollector;
 
 /**
  * Debug Toolbar Collector for Auth
  */
-class ToolbarCollector extends BaseCollector
+class ViteToolbar extends BaseCollector
 {
     /**
      * Whether this collector has data that can
@@ -56,15 +48,39 @@ class ToolbarCollector extends BaseCollector
     /**
      * Vite status
      * 
-     * @var bool
+     * @var ?bool
      */
-    protected $viteStatus = false;
+    protected $viteStatus = null;
+
+    protected array $info;
 
     public function __construct()
     {
-        /** @var \SrvKit\Vite $vite [description] */
-        $vite = service('vite');
-        $this->viteStatus = $vite->isRunning();
+       /** @var Vite $vite */
+       $vite = service('vite', false);
+
+       /** @var \CodeIgniter\Cache\CacheInterface|null $cache */
+       $cache = service('cache');
+
+       if (! $vite) {
+           log_message('error', 'Vite service is not available.');
+           $this->viteStatus = null;
+           $this->info = [];
+           return;
+       }
+
+       $this->viteStatus = $vite->isRunning();
+       $this->info = $vite->sharedInfo();
+
+       // Optionally cache the status (for e.g., 60 seconds)
+       if ($cache) {
+           $cache->save('__vite__', [
+               'status' => $this->viteStatus,
+               'info'   => $this->info
+           ], 60); // cache for 60 seconds
+       } else {
+           log_message('warning', 'Cache service not available to store Vite status.');
+       }
     }
 
     /**
@@ -72,49 +88,52 @@ class ToolbarCollector extends BaseCollector
      */
     public function getTitleDetails(): string
     {
-        if($this->viteStatus){
-            return <<<'EOD'
-            <span style="--color: #baff20;font-size:x-small !important;display:inline-block;padding:2px 6px; border-radius: 25px;border:1px solid var(--color, #747576);color:var(--color, #747576);font-family: sans-serif;line-height:initial;">ACTIVE</span>
-            EOD;
-        }
+        $status = match (true) {
+            $this->viteStatus === null => ['UNINITISE', '#baff20'],
+            $this->viteStatus === true => ['ACTIVE', '#baff20'],
+            default                   => ['INACTIVE', '#747576'],
+        };
 
-        return <<<'EOD'
-            <span style="font-size:x-small !important;display:inline-block;padding:2px 6px; border-radius: 25px;border:1px solid var(--color, #747576);color:var(--color, #747576);font-family: sans-serif;line-height:initial;">INACTIVE</span>
-            EOD;
+        [$label, $color] = $status;
+        $version = sprintf('<span style="display: inline-block;margin-right: 10px;font-weight: normal;color:#747576;font-family: monospace;">[v%1$s]</span>', Vite::VERSION);
+        $status = sprintf(
+            '<span style="--color: %1$s; font-size:x-small !important; display:inline-block; padding:2px 6px; border-radius:25px; border:1px solid var(--color, #747576); color:var(--color, #747576); font-family:sans-serif; line-height:initial;">%2$s</span>',
+            $color,
+            $label
+        );
+
+        return $version.$status;
     }
 
-    private function isViteRunning($host = 'localhost', $port = 5173) {
-
-        $connection = @fsockopen($host, $port, $errno, $errstr, 1); // 1-second timeout
-        
-        if ($connection) {
-            fclose($connection);
-            return true;
-        }
-
-        return false;
-    }
 
     /**
      * Returns the data of this collector to be formatted in the toolbar
      */
     public function display(): string
     {
-        if($this->viteStatus){
-            return <<<'EOD'
-                <p style="color:lime;font-weight:bold;font-family:courier;font-size:large;">Vite is running on port 5341</p>
-            EOD;
+        if ($this->viteStatus) {
+            $port = $this->info['port'] ?? 'unknown';
+            return <<<HTML
+                <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px; color: #baff20; font-family: 'Courier New', monospace; font-size: 1rem;">
+                    <strong style="display:block; margin-bottom: 0.5rem;">🚀 Vite Dev Server</strong>
+                    <span style="display:inline-block;">✅ Running on port <code style="color: #fff;">{$port}</code></span>
+                </div>
+            HTML;
         }
 
-        return <<<'EOD'
-            <p style="color:#a2a2a2;font-weight:normal;font-family:courier;font-size:large;">Vite is not running</p>
-        EOD;
+        return <<<HTML
+            <div style="padding: 1rem; background: #2a2a2a; border-radius: 8px; color: #ccc; font-family: 'Courier New', monospace; font-size: 1rem;">
+                <strong style="display:block; margin-bottom: 0.5rem;">🛑 Vite Dev Server</strong>
+                <span>❌ Not Running</span>
+            </div>
+        HTML;
     }
+
 
     /**
      * Gets the "badge" value for the button.
      *
-     * @return int|string|null ID of the current User, or null when not logged in
+     * @return int|string|null
      */
     public function getBadgeValue()
     {
