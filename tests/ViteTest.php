@@ -1,23 +1,20 @@
 <?php
 
+use SrvKit\Vite\Vite;
+use SrvKit\Vite\Config as ViteConfig;
 use PHPUnit\Framework\TestCase;
-use SrvKit\Vite;
 
 class ViteTest extends TestCase
-{
+{   
+    protected ViteConfig $config;
     protected function setUp(): void
     {
-
-    }
-
-    public function testExample()
-    {
-    	$this->assertTrue(true);
+        $this->config = $this->config = $this->createMock(ViteConfig::class);
     }
 
     public function testViteRunning()
     {
-    	$vite = new Vite('localhost', 5173);
+    	$vite = new Vite($this->config);
     	$this->assertIsBool($vite->isRunning());
     }
 }
