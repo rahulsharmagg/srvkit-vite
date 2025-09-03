@@ -56,31 +56,39 @@ class ViteToolbar extends BaseCollector
 
     public function __construct()
     {
-       /** @var Vite $vite */
-       $vite = service('vite', false);
+        /** @var Vite $vite */
+        $vite = service('vite', false);
 
-       /** @var \CodeIgniter\Cache\CacheInterface|null $cache */
-       $cache = service('cache');
+        /** @var \CodeIgniter\Cache\CacheInterface|null $cache */
+        $cache = service('cache');
 
-       if (! $vite) {
+        if (!$vite) {
            log_message('error', 'Vite service is not available.');
            $this->viteStatus = null;
            $this->info = [];
            return;
-       }
+        }
 
-       $this->viteStatus = $vite->isRunning();
-       $this->info = $vite->sharedInfo();
+        if ($cache) {
+            $cachedInfo = $cache->get('__vite__');
+            if($cachedInfo){
+                 $this->viteStatus = $cachedInfo['status'];
+                 $this->info = $cachedInfo['info'];
+                 return;
+            }
 
-       // Optionally cache the status (for e.g., 60 seconds)
-       if ($cache) {
-           $cache->save('__vite__', [
-               'status' => $this->viteStatus,
-               'info'   => $this->info
-           ], 60); // cache for 60 seconds
-       } else {
-           log_message('warning', 'Cache service not available to store Vite status.');
-       }
+            $this->viteStatus = $vite->isRunning();
+            $this->info = $vite->sharedInfo();
+
+            $cache->save('__vite__', [
+                'status' => $this->viteStatus,
+                'info'   => $this->info
+            ], 60); // cache for 60 seconds
+        } else {
+            log_message('warning', 'Cache service not available to store Vite status.');
+            $this->viteStatus = $vite->isRunning();
+            $this->info = $vite->sharedInfo();
+        }
     }
 
     /**
