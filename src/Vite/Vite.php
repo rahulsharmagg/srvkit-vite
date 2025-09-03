@@ -8,7 +8,7 @@ defined('ROOTPATH') || define('ROOTPATH', realpath('.' . DIRECTORY_SEPARATOR));
 use SrvKit\Vite\Config;
 
 class Vite{
-	public const VERSION = '0.1.5';
+	public const VERSION = '1.0.0';
 
 	protected ?string $host;
 
