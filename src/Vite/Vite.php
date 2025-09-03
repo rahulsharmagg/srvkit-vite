@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace SrvKit\Vite;
 
+defined('ROOTPATH') || define('ROOTPATH', realpath('.' . DIRECTORY_SEPARATOR));
+
 use SrvKit\Vite\Config;
 
 class Vite{
@@ -41,8 +43,46 @@ class Vite{
 		return $data;
 	}
 
-	private function parseViteConfig(): array
+	public function getConfig(): array
 	{
-		return [];
+		$configPath = $this->config->viteConfigPath;
+		if($configPath === null){
+			$configPath = ROOTPATH;
+		}
+
+		$parser = new ViteConfigParser($configPath);
+		return $parser->parse();
+	}
+
+	public function getManifest(): array
+	{
+		$manifestPath = $this->config->viteManifestPath;
+		if($manifestPath === null){
+			$viteConfig = $this->getConfig();
+			$rootDir = $viteConfig['root'];
+			$manifestPath = ROOTPATH . $rootDir . DIRECTORY_SEPARATOR . $viteConfig['build']['outDir'];
+		}
+		$parser = new ViteManifestParser($manifestPath);
+		return $parser->parse();
+	}
+
+	public function getBuild(): array
+	{
+		$viteConfig = $this->getConfig();
+		$serverOrigin = isset($viteConfig['base']) ? $viteConfig['base'] : '/';
+		$build = [];
+		$manifest = $this->getManifest();
+		foreach($manifest as $file => $buildInfo){
+		    if(isset($buildInfo["css"])){
+		        foreach($buildInfo["css"] as $_css){
+		            $build['styles'][] =$serverOrigin . $_css;
+		        }
+		    }
+		    if(isset($buildInfo["isEntry"]) && $buildInfo["isEntry"]){
+		        $build['javascripts'][] = $serverOrigin . $buildInfo["file"];
+		    }
+		}
+
+		return $build;
 	}
 }
