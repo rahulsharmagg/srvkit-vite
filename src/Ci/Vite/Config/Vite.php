@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SrvKit\Ci\Vite\Config;
 
-// use CodeIgniter\Config\BaseConfig;
 use SrvKit\Vite\Config;
 
 class Vite extends Config {
@@ -15,11 +14,6 @@ class Vite extends Config {
 
 	public ?string $viteManifestPath = null;
 
-	/**
-	 * Compatibility for Codeigniter4 cache
-	 * @param  array  $an_array
-	 * @return Vite          
-	 */
 	public static function __set_state(array $an_array): object
     {
         $obj = new static();
